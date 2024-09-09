@@ -1,12 +1,10 @@
 terraform {
   required_providers {
-    #  User to provision resources (firewal / cluster) in civo.com
     civo = {
       source  = "civo/civo"
       version = "1.1.2"
     }
 
-    # Used to output the kubeconfig to the local dir for local cluster access
     local = {
       source  = "hashicorp/local"
       version = "2.4.0"

@@ -5,7 +5,7 @@
 # The Civo Region to deploy the cluster in
 variable "region" {
   type        = string
-  default     = "LON1"
+  default     = "NYC1"
   description = "The region to provision the cluster against"
 }
 

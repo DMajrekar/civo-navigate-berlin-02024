@@ -11,72 +11,58 @@ destroy:
 
 step1:
 	clear
-	@echo "Terraform Provider"
 	@echo
 	cat terraform/provider.tf
 	@echo
-	@read -n 1 -s -p "Press any key to continue..."
+	@read -n 1 -s -p "Create the cluster"
 
 step2:
 	clear
-	@echo "Create the cluster"
-	@echo
 	cd terraform && terraform apply -target local_file.cluster-config -auto-approve
 	@echo
-	@read -n 1 -s -p "Press any key to continue..."
+	@read -n 1 -s -p "Get the kubeconfig for the new cluster"
 
 step3:
 	clear
-	@echo "Show the kubeconfig"
-	@echo
 	cat terraform/kubeconfig
+	@sleep 10
 	@echo
-	@read -n 1 -s -p "Press any key to continue..."
+	@read -n 1 -s -p "Get the nodes in the cluster"
 
 step4:
 	clear
-	@echo "Get the nodes in the cluster"
+	KUBECONFIG=terraform/kubeconfig kubectl get nodes 
 	@echo
-	KUBECONFIG=terraform/kubeconfig kubectl get nodes
-	@echo
-	@read -n 1 -s -p "Press any key to continue..."
+	@read -n 1 -s -p "Create the database"
 
 step5:
 	clear
-	@echo "Show the database terraform"
 	@echo
 	cat terraform/civo-database.tf
-	recho
-	@read -n 1 -s -p "Press any key to continue..."
+	@echo
+	@read -n 1 -s -p ""
 
 step6:
 	clear
 	@echo "Create the database"
 	@echo
-	cd terraform/lon && terraform apply -target civo_database.database -auto-approve
+	cd terraform && terraform apply -target civo_database.database -auto-approve
 	@echo
-	@read -n 1 -s -p "Press any key to continue..."
+	@read -n 1 -s -p ""
 
 step7:
 	clear
-	@echo "Apply the rest of the config"
+	@echo "Create the remaining resources for the rest of the demo"
 	@echo
-	cd terraform/nyc && terraform apply -auto-approve
+	cd terraform && terraform apply -auto-approve
 	@echo
-	@read -n 1 -s -p "Press any key to continue..."
+	@read -n 1 -s -p "Get the secret from the cluster"
 
 step8:
 	clear
-	@echo "Show the secret in the cluster with the database details"
+	KUBECONFIG=terraform/kubeconfig kubectl get secret -n default database-access -o json | jq '.data'
 	@echo
-	KUBECONFIG=terraform/lon/kubeconfig kubectl get secret -n default database-access -o json | jq '.data'
-	@echo
-	@read -n 1 -s -p "Press any key to continue..."
-
-# watch all pods in london
-watchLondon:
-	kubectl --kubeconfig=terraform/lon/kubeconfig get pods --all-namespaces -w
-
+	@read -n 1 -s -p ""
 
 demo: step1 step2 step3 step4 step5 step6 step7 step8 
 
